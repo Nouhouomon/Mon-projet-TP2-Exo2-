@@ -1,0 +1,333 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{float}
+\usepackage[export]{adjustbox}
+\usepackage{tikz}
+\usetikzlibrary{babel,arrows.meta,shapes.geometric,shapes.multipart,positioning,calc}
+
+\tikzset{
+  every node/.style={font=\small},
+  box/.style={draw, rounded corners=3pt, fill=blue!5, minimum height=0.9cm, minimum width=2.4cm, align=center},
+  class/.style={rectangle split, rectangle split parts=3, draw, fill=blue!5,
+    align=left, text width=3.2cm, rectangle split part fill={blue!15,blue!5,blue!5}},
+  classb/.style={class, rectangle split parts=2, rectangle split part fill={blue!15,blue!5}},
+  herit/.style={-{Triangle[open,length=8pt,width=8pt]}},
+  fleche/.style={-{Stealth}},
+  dep/.style={dashed,-{Stealth}},
+  lbl/.style={font=\scriptsize, midway, fill=white, inner sep=1pt},
+  comp/.style={draw, fill=yellow!10, minimum width=3cm, minimum height=1.3cm, align=center},
+  noeud/.style={draw, fill=gray!10, minimum width=3.4cm, minimum height=3cm},
+  art/.style={draw, fill=white, minimum width=2.6cm, minimum height=1cm, align=center},
+  uc/.style={ellipse, draw, fill=green!6, minimum width=3.4cm, minimum height=1cm, align=center},
+  etat/.style={draw, rounded corners=8pt, fill=orange!8, minimum width=2.2cm, minimum height=1cm, align=center},
+  frame/.style={draw, fill=gray!8, minimum width=3.6cm, minimum height=1cm, align=center},
+}
+
+% Paquetage : id, x, y, nom
+\newcommand{\pkg}[4]{%
+  \node[draw, fill=yellow!10, minimum width=2.8cm, minimum height=1.5cm] (#1) at (#2,#3) {#4};
+  \draw[fill=yellow!10] (#1.north west) rectangle ++(1cm,0.3cm);}
+
+% Acteur : id, x, y, nom
+\newcommand{\acteur}[4]{%
+  \draw (#2,#3+0.5) circle (0.15);
+  \draw (#2,#3+0.35) -- (#2,#3-0.1);
+  \draw (#2-0.25,#3+0.2) -- (#2+0.25,#3+0.2);
+  \draw (#2,#3-0.1) -- (#2-0.2,#3-0.5);
+  \draw (#2,#3-0.1) -- (#2+0.2,#3-0.5);
+  \node[inner sep=0pt, minimum size=1cm] (#1) at (#2,#3) {};
+  \node[below] at (#2,#3-0.5) {#4};}
+
+% Ligne de vie : id, x, nom
+\newcommand{\ligne}[3]{%
+  \node[box, minimum width=2.4cm] (#1) at (#2,0) {#3};
+  \draw[dashed] (#1.south) -- (#2,-7);}
+
+% Messages : x1, x2, y, texte
+\newcommand{\msg}[4]{\draw[fleche] (#1,#3) -- node[above,font=\scriptsize]{#4} (#2,#3);}
+\newcommand{\ret}[4]{\draw[dep] (#1,#3) -- node[above,font=\scriptsize]{#4} (#2,#3);}
+
+\begin{document}
+
+\begin{center}
+  {\LARGE \textbf{Les 13 types de diagrammes UML}}
+\end{center}
+
+\section*{Diagrammes de structure}
+
+% 1. Classes
+\begin{figure}[H]
+\centering
+\begin{adjustbox}{max width=\linewidth}
+\begin{tikzpicture}
+\node[class] (p) at (0,0) {\hfill\textbf{Personne}\hfill\nodepart{second}- nom : String\\- age : int\nodepart{third}+ getNom() : String};
+\node[class] (e) at (-3.8,-4) {\hfill\textbf{Étudiant}\hfill\nodepart{second}- numero : int\nodepart{third}+ sInscrire()};
+\node[class] (pr) at (3.8,-4) {\hfill\textbf{Professeur}\hfill\nodepart{second}- salaire : float\nodepart{third}+ enseigner()};
+\node[classb] (c) at (-3.8,-7.2) {\hfill\textbf{Cours}\hfill\nodepart{second}- titre : String};
+\draw[herit] (e.north) -- (p.south west);
+\draw[herit] (pr.north) -- (p.south east);
+\draw (e.south) -- node[right,font=\scriptsize,pos=0.5]{suit} node[left,font=\scriptsize,pos=0.15]{*} node[left,font=\scriptsize,pos=0.85]{1..*} (c.north);
+\draw (pr.south) |- node[above,font=\scriptsize,pos=0.8]{enseigne} (c.east);
+\end{tikzpicture}
+\end{adjustbox}
+\caption{Diagramme de classes}
+\end{figure}
+
+% 2. Objets
+\begin{figure}[H]
+\centering
+\begin{adjustbox}{max width=\linewidth}
+\begin{tikzpicture}
+\node[classb] (a) at (0,0) {\hfill\underline{alice : Étudiant}\hfill\nodepart{second}numero = 42};
+\node[classb] (b) at (6.5,0) {\hfill\underline{uml : Cours}\hfill\nodepart{second}titre = UML};
+\draw (a.east) -- node[above,font=\scriptsize]{suit} (b.west);
+\end{tikzpicture}
+\end{adjustbox}
+\caption{Diagramme d'objets}
+\end{figure}
+
+% 3. Composants
+\begin{figure}[H]
+\centering
+\begin{adjustbox}{max width=\linewidth}
+\begin{tikzpicture}
+\node[comp] (ui) at (0,0) {«component»\\\textbf{Interface web}};
+\node[comp] (api) at (5,0) {«component»\\\textbf{Service API}};
+\node[comp] (db) at (10,0) {«component»\\\textbf{Base de données}};
+\draw[dep] (ui) -- node[above,font=\scriptsize]{«utilise»} (api);
+\node[circle,draw,fill=white,inner sep=2.5pt] (i) at (7.5,0) {};
+\draw (api.east) -- (i);
+\draw (7.5,0.25) arc (90:-90:0.25);
+\draw (7.75,0) -- (db.west);
+\node[font=\scriptsize,below] at (7.5,-0.3) {IDonnées};
+\end{tikzpicture}
+\end{adjustbox}
+\caption{Diagramme de composants}
+\end{figure}
+
+% 4. Déploiement
+\begin{figure}[H]
+\centering
+\begin{adjustbox}{max width=\linewidth}
+\begin{tikzpicture}
+\node[noeud] (c) at (0,0) {};
+\node[anchor=north,align=center] at (c.north) {«device»\\\textbf{Poste client}};
+\node[art] at (0,-0.8) {«artifact»\\Navigateur};
+\node[noeud] (s) at (5.5,0) {};
+\node[anchor=north,align=center] at (s.north) {«server»\\\textbf{Serveur web}};
+\node[art] at (5.5,-0.8) {«artifact»\\app.war};
+\node[noeud] (d) at (11,0) {};
+\node[anchor=north,align=center] at (d.north) {«server»\\\textbf{Serveur BD}};
+\node[art] at (11,-0.8) {«artifact»\\base.sql};
+\draw (c.east) -- node[above,font=\scriptsize]{«HTTP»} (s.west);
+\draw (s.east) -- node[above,font=\scriptsize]{«JDBC»} (d.west);
+\end{tikzpicture}
+\end{adjustbox}
+\caption{Diagramme de déploiement}
+\end{figure}
+
+% 5. Paquetages
+\begin{figure}[H]
+\centering
+\begin{adjustbox}{max width=\linewidth}
+\begin{tikzpicture}
+\pkg{p}{0}{0}{Présentation}
+\pkg{m}{4.5}{0}{Métier}
+\pkg{d}{9}{0}{Données}
+\pkg{u}{4.5}{-3.2}{Utilitaires}
+\draw[dep] (p) -- (m);
+\draw[dep] (m) -- (d);
+\draw[dep] (p.south) |- (u.west);
+\draw[dep] (m.south) -- (u.north);
+\draw[dep] (d.south) |- (u.east);
+\end{tikzpicture}
+\end{adjustbox}
+\caption{Diagramme de paquetages}
+\end{figure}
+
+% 6. Structure composite
+\begin{figure}[H]
+\centering
+\begin{adjustbox}{max width=\linewidth}
+\begin{tikzpicture}
+\draw (0,0) rectangle (10,5);
+\node at (5,4.5) {\textbf{Voiture}};
+\node[box] (m) at (2.4,2.3) {moteur\\: Moteur};
+\node[box] (b) at (5.2,2.3) {boîte\\: Boîte};
+\node[box] (r) at (8,2.3) {roues\\: Roue [4]};
+\node[draw,minimum size=0.3cm,fill=white,inner sep=0pt] (pl) at (0,2.3) {};
+\node[draw,minimum size=0.3cm,fill=white,inner sep=0pt] (pr) at (10,2.3) {};
+\draw (pl) -- (m.west);
+\draw (m.east) -- (b.west);
+\draw (b.east) -- (r.west);
+\draw (r.east) -- (pr);
+\node[font=\scriptsize,below] at (pl.south) {port 1};
+\node[font=\scriptsize,below] at (pr.south) {port 2};
+\end{tikzpicture}
+\end{adjustbox}
+\caption{Diagramme de structure composite}
+\end{figure}
+
+\section*{Diagrammes de comportement}
+
+% 7. Cas d'utilisation
+\begin{figure}[H]
+\centering
+\begin{adjustbox}{max width=\linewidth}
+\begin{tikzpicture}
+\draw[rounded corners=4pt] (1.8,-0.2) rectangle (10.8,6.4);
+\node at (6.3,6.0) {\textbf{Système de bibliothèque}};
+\node[uc] (emp) at (4.5,4.8) {Emprunter un livre};
+\node[uc] (ver) at (8.5,4.8) {Vérifier le compte};
+\node[uc] (rec) at (4.5,2.8) {Rechercher un livre};
+\node[uc] (res) at (8.5,3.0) {Réserver un livre};
+\node[uc] (ger) at (8.5,1.3) {Gérer le catalogue};
+\acteur{lec}{0.5}{3}{Lecteur}
+\acteur{bib}{12.7}{3}{Bibliothécaire}
+\draw (lec.east) -- (emp.west);
+\draw (lec.east) -- (rec.west);
+\draw (bib.west) -- (ger.east);
+\draw (bib.west) -- (ver.east);
+\draw[dep] (emp) -- node[lbl]{«include»} (ver);
+\draw[dep] (res.north west) -- node[lbl]{«extend»} (emp.south east);
+\end{tikzpicture}
+\end{adjustbox}
+\caption{Diagramme de cas d'utilisation}
+\end{figure}
+
+% 8. Activité
+\begin{figure}[H]
+\centering
+\begin{adjustbox}{max width=\linewidth}
+\begin{tikzpicture}
+\node[circle,fill=black,minimum size=0.35cm,inner sep=0] (i) at (0,0) {};
+\node[box] (a1) at (0,-1.4) {Saisir la commande};
+\node[diamond,draw,fill=blue!5,aspect=2,inner sep=2pt] (d) at (0,-3) {valide ?};
+\node[box] (a2) at (0,-4.7) {Payer};
+\node[box] (a3) at (0,-6.1) {Expédier};
+\node[circle,draw,minimum size=0.55cm,inner sep=0] (f) at (0,-7.5) {};
+\fill (f) circle (0.17);
+\node[box] (a4) at (4.5,-3) {Afficher l'erreur};
+\draw[fleche] (i) -- (a1);
+\draw[fleche] (a1) -- (d);
+\draw[fleche] (d) -- node[right,font=\scriptsize]{[oui]} (a2);
+\draw[fleche] (a2) -- (a3);
+\draw[fleche] (a3) -- (f);
+\draw[fleche] (d) -- node[above,font=\scriptsize]{[non]} (a4);
+\draw[fleche] (a4.north) |- (a1.east);
+\end{tikzpicture}
+\end{adjustbox}
+\caption{Diagramme d'activité}
+\end{figure}
+
+% 9. États-transitions
+\begin{figure}[H]
+\centering
+\begin{adjustbox}{max width=\linewidth}
+\begin{tikzpicture}
+\node[circle,fill=black,minimum size=0.35cm,inner sep=0] (i) at (0,0) {};
+\node[etat] (b) at (2.2,0) {Brouillon};
+\node[etat] (s) at (6.4,0) {Soumise};
+\node[etat] (v) at (6.4,-3) {Validée};
+\node[circle,draw,minimum size=0.55cm,inner sep=0] (f) at (6.4,-5.2) {};
+\fill (f) circle (0.17);
+\draw[fleche] (i) -- (b);
+\draw[fleche] (b.north east) to[bend left=30] node[above,font=\scriptsize]{soumettre} (s.north west);
+\draw[fleche] (s.south west) to[bend left=30] node[below,font=\scriptsize]{rejeter} (b.south east);
+\draw[fleche] (s) -- node[right,font=\scriptsize]{valider} (v);
+\draw[fleche] (v) -- node[right,font=\scriptsize]{archiver} (f);
+\end{tikzpicture}
+\end{adjustbox}
+\caption{Diagramme d'états-transitions}
+\end{figure}
+
+\section*{Diagrammes d'interaction}
+
+% 10. Séquence
+\begin{figure}[H]
+\centering
+\begin{adjustbox}{max width=\linewidth}
+\begin{tikzpicture}
+\ligne{u}{0}{Utilisateur}
+\ligne{i}{3.6}{Interface}
+\ligne{s}{7.2}{Serveur}
+\ligne{d}{10.8}{Base de données}
+\draw[fill=white] (7.1,-2.1) rectangle (7.3,-5.2);
+\msg{0}{3.6}{-1.5}{saisir()}
+\msg{3.6}{7.2}{-2.3}{authentifier()}
+\msg{7.2}{10.8}{-3.1}{requête()}
+\ret{10.8}{7.2}{-3.9}{résultat}
+\ret{7.2}{3.6}{-4.7}{jeton}
+\ret{3.6}{0}{-5.5}{accueil}
+\end{tikzpicture}
+\end{adjustbox}
+\caption{Diagramme de séquence}
+\end{figure}
+
+% 11. Communication
+\begin{figure}[H]
+\centering
+\begin{adjustbox}{max width=\linewidth}
+\begin{tikzpicture}
+\node[box,minimum width=2.8cm] (u) at (0,0) {\underline{u : Utilisateur}};
+\node[box,minimum width=2.8cm] (c) at (6,0) {\underline{ctrl : Contrôleur}};
+\node[box,minimum width=2.8cm] (m) at (6,-3.5) {\underline{m : Modèle}};
+\node[box,minimum width=2.8cm] (bd) at (0,-3.5) {\underline{bd : Base}};
+\draw (u) -- node[above,font=\scriptsize]{1 : saisir() $\rightarrow$} (c);
+\draw (c) -- node[right,font=\scriptsize]{1.1 : valider() $\downarrow$} (m);
+\draw (m) -- node[above,font=\scriptsize]{1.1.1 : lire() $\leftarrow$} (bd);
+\end{tikzpicture}
+\end{adjustbox}
+\caption{Diagramme de communication}
+\end{figure}
+
+% 12. Vue d'ensemble des interactions
+\begin{figure}[H]
+\centering
+\begin{adjustbox}{max width=\linewidth}
+\begin{tikzpicture}
+\node[circle,fill=black,minimum size=0.35cm,inner sep=0] (i) at (0,0) {};
+\node[frame] (a) at (0,-1.6) {\textbf{sd} Authentification};
+\node[diamond,draw,fill=blue!5,aspect=2,inner sep=2pt] (d) at (0,-3.3) {ok ?};
+\node[frame] (c) at (0,-5.2) {\textbf{sd} Consultation};
+\node[frame] (e) at (5,-3.3) {\textbf{sd} Erreur};
+\node[circle,draw,minimum size=0.55cm,inner sep=0] (f) at (0,-7) {};
+\fill (f) circle (0.17);
+\draw[fleche] (i) -- (a);
+\draw[fleche] (a) -- (d);
+\draw[fleche] (d) -- node[right,font=\scriptsize]{[succès]} (c);
+\draw[fleche] (d) -- node[above,font=\scriptsize]{[échec]} (e);
+\draw[fleche] (c) -- (f);
+\draw[fleche] (e.south) |- (f.east);
+\end{tikzpicture}
+\end{adjustbox}
+\caption{Diagramme de vue d'ensemble des interactions}
+\end{figure}
+
+% 13. Timing
+\begin{figure}[H]
+\centering
+\begin{adjustbox}{max width=\linewidth}
+\begin{tikzpicture}
+\foreach \y in {0,1,2,-2.5,-3.5} \draw[gray!30] (0,\y) -- (10,\y);
+\node[left] at (0,0) {Rouge};
+\node[left] at (0,1) {Vert};
+\node[left] at (0,2) {Orange};
+\node[left] at (-1.6,1) {\textbf{Feu}};
+\node[left] at (0,-2.5) {Passage};
+\node[left] at (0,-3.5) {Attente};
+\node[left] at (-1.6,-3) {\textbf{Piéton}};
+\draw[very thick,blue!70!black] (0,0) -- (3,0) -- (3,1) -- (7,1) -- (7,2) -- (8,2) -- (8,0) -- (10,0);
+\draw[very thick,red!70!black] (0,-2.5) -- (3,-2.5) -- (3,-3.5) -- (8,-3.5) -- (8,-2.5) -- (10,-2.5);
+\foreach \x in {3,7,8} \draw[dashed,gray] (\x,2.4) -- (\x,-4);
+\draw[fleche] (0,-4.3) -- (10.6,-4.3) node[right]{t};
+\foreach \x in {0,3,7,8,10} \draw (\x,-4.2) -- (\x,-4.4) node[below]{\x\,s};
+\end{tikzpicture}
+\end{adjustbox}
+\caption{Diagramme de timing}
+\end{figure}
+
+\end{document}
