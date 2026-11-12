@@ -1,0 +1,9 @@
+@startuml
+package "Application RH" {
+  [Interface Web] --> [Gestion Agents]
+  [Gestion Agents] --> [Gestion Paie]
+}
+database "Base de données" as DB
+[Gestion Agents] --> DB
+[Gestion Paie] --> DB
+@enduml

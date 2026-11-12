@@ -1,0 +1,16 @@
+@startuml
+left to right direction
+actor "Agent" as A
+actor "Responsable RH" as R
+rectangle "Système de gestion du personnel" {
+  usecase "Consulter sa fiche" as UC1
+  usecase "Demander un congé" as UC2
+  usecase "Valider un congé" as UC3
+  usecase "S'authentifier" as UC4
+}
+A --> UC1
+A --> UC2
+R --> UC3
+UC1 ..> UC4 : <<include>>
+UC2 ..> UC4 : <<include>>
+@enduml

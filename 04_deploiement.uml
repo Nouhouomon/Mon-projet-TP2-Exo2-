@@ -1,0 +1,13 @@
+@startuml
+node "Poste client" {
+  [Navigateur]
+}
+node "Serveur Web" {
+  [Application RH]
+}
+node "Serveur BD" {
+  database "MySQL"
+}
+[Navigateur] --> [Application RH] : HTTP
+[Application RH] --> MySQL : JDBC
+@enduml

@@ -1,0 +1,23 @@
+@startuml
+class Agent {
+  - matricule : String
+  - nom : String
+  - dateEmbauche : Date
+  + afficherFiche() : void
+}
+class Service {
+  - code : String
+  - libelle : String
+}
+class Contrat {
+  - type : String
+  - dateDebut : Date
+  - dateFin : Date
+}
+abstract class Personne {
+  # nom : String
+}
+Personne <|-- Agent
+Service "1" o-- "0..*" Agent : emploie
+Agent "1" *-- "1..*" Contrat : possède
+@enduml

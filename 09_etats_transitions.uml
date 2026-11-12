@@ -1,0 +1,8 @@
+@startuml
+[*] --> Brouillon
+Brouillon --> Soumise : soumettre()
+Soumise --> Validée : valider()
+Soumise --> Refusée : refuser()
+Validée --> [*]
+Refusée --> [*]
+@enduml

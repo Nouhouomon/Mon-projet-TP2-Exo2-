@@ -1,0 +1,18 @@
+@startuml
+robust "Agent" as A
+concise "Demande" as D
+
+@0
+A is Absent
+D is Brouillon
+
+@100
+A is Présent
+D is Soumise
+
+@300
+D is Validée
+
+@400
+A is Absent
+@enduml

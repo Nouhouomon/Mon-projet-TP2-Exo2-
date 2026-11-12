@@ -1,0 +1,9 @@
+@startuml
+component "Système RH" {
+  portin "p1"
+  component "Module Agents" as M1
+  component "Module Paie" as M2
+  p1 --> M1
+  M1 --> M2 : connecteur
+}
+@enduml

@@ -1,0 +1,13 @@
+@startuml
+package "Présentation" {
+  class VueAgent
+}
+package "Métier" {
+  class GestionAgent
+}
+package "Données" {
+  class AgentDAO
+}
+"Présentation" ..> "Métier" : <<use>>
+"Métier" ..> "Données" : <<use>>
+@enduml

@@ -1,0 +1,10 @@
+@startuml
+object "a1 : Agent" as a1 {
+  nom = "KOUASSI"
+  matricule = "M001"
+}
+object "s1 : Service" as s1 {
+  libelle = "Ressources humaines"
+}
+s1 --> a1 : emploie
+@enduml

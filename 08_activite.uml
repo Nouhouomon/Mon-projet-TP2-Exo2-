@@ -1,0 +1,12 @@
+@startuml
+start
+:Agent dépose une demande de congé;
+:Le service RH vérifie le dossier;
+if (Solde suffisant ?) then (oui)
+  :Valider la demande;
+else (non)
+  :Refuser la demande;
+endif
+:Notifier l'agent;
+stop
+@enduml

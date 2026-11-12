@@ -1,0 +1,11 @@
+@startuml
+start
+:ref : S'authentifier;
+if (Authentification OK ?) then (oui)
+  :ref : Demander un congé;
+  :ref : Valider le congé;
+else (non)
+  :Afficher une erreur;
+endif
+stop
+@enduml
